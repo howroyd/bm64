@@ -10,27 +10,24 @@ void setup() {
   Serial1.begin(115200);
   Serial.setTimeout(2000); // 2s timeout
 
+   delay(5000); // Give BM64 time to boot // TODO
+
   // TODO config BM64
 
   delay(10);
 }
 
 void loop() {
-  delay(1000);
+  Pkt_out request_paired_device_list(0x0e);
+  request_paired_device_list.send();
+  
+  delay(5000);
 }
 
 void serialEvent()
 {
   String str = Serial.readString();
-
-  BM64_uart_pkt_t pkt;
-  pkt.payload_len = str.length()+1;
-  pkt.op_code = 0x12;
-
-  pkt.payload = new uint8_t[pkt.payload_len];
-  str.getBytes(pkt.payload, pkt.payload_len);
-
-  Pkt_out pkt_out(pkt);
+  Pkt_out pkt_out(0x12, str);
   pkt_out.send();
 }
 
