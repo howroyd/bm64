@@ -1,29 +1,45 @@
-size_t string_to_bin(String str, uint8_t* buf);
-size_t bin_to_pkt(uint8_t* buf, uint8_t len);
+#include "Bm64_pkt.h"
 
+#define SPP_MAX_PKT_SIZE 128
+#define OP_CODE_SPP 0x12
 
 void setup() {
+  Serial.begin(115200);
+  Serial.setTimeout(10000); // 10s timeout
+
   Serial1.begin(115200);
+  Serial.setTimeout(2000); // 2s timeout
+
+  // TODO config BM64
 
   delay(10);
-
-
-  
 }
 
 void loop() {
-
+  delay(1000);
 }
 
-size_t string_to_bin(String str, uint8_t* buf)
+void serialEvent()
 {
-  size_t len = str.length() + 1;
-  buf = new uint8_t[len ? len<128 : len=128];
-  str.getBytes(buf, len);
-  return len;
+  String str = Serial.readString();
+
+  BM64_uart_pkt_t pkt;
+  pkt.payload_len = str.length()+1;
+  pkt.op_code = 0x12;
+
+  pkt.payload = new uint8_t[pkt.payload_len];
+  str.getBytes(pkt.payload, pkt.payload_len);
+
+  Pkt_out pkt_out(pkt);
+  pkt_out.send();
 }
 
-size_t bin_to_pkt(uint8_t* buf, uint8_t len)
+void serialEvent1()
 {
-  
+  uint8_t BUFFER[SPP_MAX_PKT_SIZE+10];
+  uint16_t pkt_len = Serial1.readBytes(BUFFER, SPP_MAX_PKT_SIZE+10);
+
+  Pkt_in pkt(BUFFER, pkt_len);
+
+  Serial.println(pkt.as_string());
 }
