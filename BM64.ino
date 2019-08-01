@@ -5,10 +5,12 @@
 
 void setup() {
   Serial.begin(115200);
-  Serial.setTimeout(10000); // 10s timeout
+  Serial.setTimeout(1000); // 10s timeout
+
+  Serial.println("Starting");
 
   Serial1.begin(115200);
-  Serial.setTimeout(2000); // 2s timeout
+  Serial.setTimeout(1000); // 2s timeout
 
    delay(5000); // Give BM64 time to boot // TODO
 
@@ -18,15 +20,17 @@ void setup() {
 }
 
 void loop() {
+  Serial.println("Tick");
   Pkt_out request_paired_device_list(0x0e);
   request_paired_device_list.send();
   
-  delay(5000);
+  delay(1000);
 }
 
 void serialEvent()
 {
   String str = Serial.readString();
+  Serial.println(str);
   Pkt_out pkt_out(0x12, str);
   pkt_out.send();
 }
